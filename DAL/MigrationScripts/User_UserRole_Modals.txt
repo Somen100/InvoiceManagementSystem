@@ -1,0 +1,31 @@
+﻿BEGIN
+    CREATE TABLE [__EFMigrationsHistory] (
+        [MigrationId] nvarchar(150) NOT NULL,
+        [ProductVersion] nvarchar(32) NOT NULL,
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+    );
+END;
+
+CREATE TABLE [Roles] (
+    [RoleId] int NOT NULL IDENTITY,
+    [RoleName] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_Roles] PRIMARY KEY ([RoleId])
+);
+CREATE TABLE [Users] (
+    [UserId] int NOT NULL IDENTITY,
+    [Username] nvarchar(max) NOT NULL,
+    [PasswordHash] nvarchar(max) NOT NULL,
+    [RoleId] int NOT NULL,
+    CONSTRAINT [PK_Users] PRIMARY KEY ([UserId]),
+    CONSTRAINT [FK_Users_Roles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [Roles] ([RoleId]) ON DELETE CASCADE
+);
+
+CREATE INDEX [IX_Users_RoleId] ON [Users] ([RoleId]);
+
+--------------------------------------------------------------------
+ALTER TABLE [Users] ADD [IsActive] bit NOT NULL DEFAULT CAST(0 AS bit);
+ALTER TABLE [Roles] ADD [IsActive] bit NOT NULL DEFAULT CAST(0 AS bit);
+
+--------------------------------------------------------------------
+
+ALTER TABLE [Users] ADD [Email] nvarchar(max) NOT NULL DEFAULT N'';

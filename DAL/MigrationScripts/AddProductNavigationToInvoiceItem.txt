@@ -1,0 +1,51 @@
+﻿
+      IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+      BEGIN
+          CREATE TABLE [__EFMigrationsHistory] (
+              [MigrationId] nvarchar(150) NOT NULL,
+              [ProductVersion] nvarchar(32) NOT NULL,
+              CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+          );
+      END;
+
+      SELECT 1
+
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+
+      SELECT [MigrationId], [ProductVersion]
+      FROM [__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+ 
+   
+   ------------------------------------------------------------------------------------------------
+
+      CREATE INDEX [IX_InvoiceItems_ProductId] ON [InvoiceItems] ([ProductId]);
+
+      ALTER TABLE [InvoiceItems] ADD CONSTRAINT [FK_InvoiceItems_Products_ProductId] FOREIGN KEY ([ProductId]) REFERENCES [Products] ([ProductId]) ON DELETE CASCADE;
+
+      INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+      VALUES (N'20241219211621_AddProductNavigationToInvoiceItem', N'9.0.0');
+
+      DECLARE @result int;
+      EXEC @result = sp_releaseapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session';
+      SELECT @result
+
+      -------------------------------------------------------------------------------------
+
+      CREATE UNIQUE INDEX [IX_Invoices_InvoiceNumber] ON [Invoices] ([InvoiceNumber]);
+
+      -------------------------------------------------------
+
+     --------------------- add gst and discount columns in invoice modal
+
+      ALTER TABLE [Invoices] ADD [DiscountPercentage] decimal(18,2) NOT NULL DEFAULT 0.0;
+      ALTER TABLE [Invoices] ADD [GSTPercentage] decimal(18,2) NOT NULL DEFAULT 0.0;
+
+      --------------------- updated gst and discount columns in invoice modal and product modal
+
+      ALTER TABLE [Invoices] DROP COLUMN [GSTPercentage];
+
+      ALTER TABLE [Products] ADD [GSTPercentage] decimal(18,2) NOT NULL DEFAULT 0.0;
+
+      ------------------------------------------
+      ALTER TABLE [InvoiceItems] DROP COLUMN [UnitPrice];

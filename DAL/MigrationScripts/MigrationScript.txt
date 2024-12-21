@@ -1,0 +1,116 @@
+﻿//Initial setup
+
+      CREATE DATABASE [InvoiceDb];
+
+
+      IF SERVERPROPERTY('EngineEdition') <> 5
+      BEGIN
+          ALTER DATABASE [InvoiceDb] SET READ_COMMITTED_SNAPSHOT ON;
+      END;
+
+
+      SELECT 1
+
+
+      DECLARE @result int;
+  
+
+      SELECT @result
+
+
+      IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+      BEGINIService
+          CREATE TABLE [__EFMigrationsHistory] (
+              [MigrationId] nvarchar(150) NOT NULL,
+              [ProductVersion] nvarchar(32) NOT NULL,
+              CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+          );
+      END;
+
+
+
+      SELECT 1
+
+
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+
+
+      SELECT [MigrationId], [ProductVersion]
+      FROM [__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+
+
+Applying migration '20241219184739_Initial Create'.
+
+
+      CREATE TABLE [AuditTrails] (
+          [AuditId] int NOT NULL IDENTITY,
+          [TableName] nvarchar(max) NOT NULL,
+          [Operation] nvarchar(max) NOT NULL,
+          [Changes] nvarchar(max) NOT NULL,
+          [Timestamp] datetime2 NOT NULL,
+          [PerformedBy] nvarchar(max) NOT NULL,
+          CONSTRAINT [PK_AuditTrails] PRIMARY KEY ([AuditId])
+      );
+
+
+      CREATE TABLE [Customers] (
+          [CustomerId] int NOT NULL IDENTITY,
+          [Name] nvarchar(100) NOT NULL,
+          [Email] nvarchar(max) NOT NULL,
+          [PhoneNumber] nvarchar(15) NOT NULL,
+          [Address] nvarchar(250) NOT NULL,
+          [IsActive] bit NOT NULL,
+          CONSTRAINT [PK_Customers] PRIMARY KEY ([CustomerId])
+      );
+
+
+      CREATE TABLE [Products] (
+          [ProductId] int NOT NULL IDENTITY,
+          [Name] nvarchar(100) NOT NULL,
+          [Description] nvarchar(250) NOT NULL,
+          [UnitPrice] decimal(18,2) NOT NULL,
+          [IsActive] bit NOT NULL,
+          CONSTRAINT [PK_Products] PRIMARY KEY ([ProductId])
+      );
+
+
+      CREATE TABLE [Invoices] (
+          [InvoiceId] int NOT NULL IDENTITY,
+          [InvoiceNumber] nvarchar(50) NOT NULL,
+          [CustomerId] int NOT NULL,
+          [CreatedAt] datetime2 NOT NULL,
+          [UpdatedAt] datetime2 NOT NULL,
+          [TotalAmount] decimal(18,2) NOT NULL,
+          [Status] nvarchar(20) NOT NULL,
+          [IsActive] bit NOT NULL,
+          CONSTRAINT [PK_Invoices] PRIMARY KEY ([InvoiceId]),
+          CONSTRAINT [FK_Invoices_Customers_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [Customers] ([CustomerId]) ON DELETE CASCADE
+      );
+
+
+      CREATE TABLE [InvoiceItems] (
+          [InvoiceItemId] int NOT NULL IDENTITY,
+          [InvoiceId] int NOT NULL,
+          [ProductId] int NOT NULL,
+          [Quantity] int NOT NULL,
+          [UnitPrice] decimal(18,2) NOT NULL,
+          [TotalPrice] decimal(18,2) NOT NULL,
+          [IsActive] bit NOT NULL,
+          CONSTRAINT [PK_InvoiceItems] PRIMARY KEY ([InvoiceItemId]),
+          CONSTRAINT [FK_InvoiceItems_Invoices_InvoiceId] FOREIGN KEY ([InvoiceId]) REFERENCES [Invoices] ([InvoiceId]) ON DELETE CASCADE
+      );
+
+      CREATE INDEX [IX_InvoiceItems_InvoiceId] ON [InvoiceItems] ([InvoiceId]);
+
+
+      CREATE INDEX [IX_Invoices_CustomerId] ON [Invoices] ([CustomerId]);
+
+
+      INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+      VALUES (N'20241219184739_Initial Create', N'9.0.0');
+
+
+      DECLARE @result int;
+      EXEC @result = sp_releaseapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session';
+      SELECT @result

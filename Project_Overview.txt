@@ -1,0 +1,106 @@
+
+Technical Requirements Adhered to:
+
+.Net Core
+
+Design Pattern followed: Repository Pattern
+
+		4 -layer architecture:
+			1. Model: contains all models
+			2. DAL(Data Access Layer): Contains DbCotext, and Repositories, IRepositories,
+				Migration scripts
+					Responsible for commmunicating with database.
+			3. BAL(Business Layer): or the Service Layer
+			4. API Layer: Containing controllers, DTOs, Program.cs, Service extension file.
+
+Dependency Injection :
+		1. Interfaces are used in the 2 layers DAL & BAL instead of directly used class objects.
+
+ServiceExtension : Service Configuration file in API Layer
+
+Generic Repo : for demo purpose: used in AuditTrailRepo (in DAL)
+
+Authentication: JWT token
+
+Audit Trail
+
+JWT Authentication 
+
+Swagger documentation
+
+Logging and Monitoring: Serilog
+
+Exception handling: Try-Catch block in each controller and 
+Global Exception handling through a middleware "GlobalExceptionHandlerMiddleware" in API Layer
+
+demo of Global Exception handling is in DeleteProduct endpoint.
+
+Code First Approach in EF Core:
+----------------------------------------------------------------------
+
+Schema design:
+
+Models used: User, RoleMaster, Customer, Product, InvoiceItem, Invoice, AuditTrail, etc
+
+INVOICE Model: 
+	Unique Identifier (InvoiceNumber),
+	CustomerId, 
+	TimeStamps, Total Amount, 
+	Status( Draft, Pending, Overdue, Paid)
+----------------------------------------------------------------------
+
+Workflow / Functionality:
+
+
+A single user has a single ROLE at a time.
+
+When a USER is created, His Role is defined.
+
+When he log in: A JWT token is generate by the server and sent back to client in response.
+
+			This token can be sent along with subsequent requests in the response header.
+
+			For now, I kept Anonymous over endpoints to make it efffective.
+
+The Authenticated USER can create multiple CUSTOMERS.
+
+
+The Authenticated user can create an INVOICE.
+An INVOICE contains data related to multiple or single INVOICEITEMS and CUSTOMER.
+	: An Invoice Item is the PRODUCT
+	
+So, when an invoice is created, Along with Invoice table, InvoiceItem table also gets populated.
+
+INVOICE TOTAL is calculated based on the Selected InvoiceItems. 
+		(Logic is in CreateInvoiceAsync Endpoint.)
+--------------------------------------------------------------------------
+
+CRUD operations are performed for Invoice and other tables
+
+Advance Querying and Filtering: In the same GET API of Invoices, 
+		I kept invoiceNumber, Status and Customer Id as Filtering Conditions
+
+
+Validation : Required, StringLength, and also handled it by returning exception through controller in case its not matched
+or invalid data in requested or invalid payload is passed.
+
+
+List Invoices with Pagination and Filtering: 
+
+	 GetAllInvoice endpoint contains  Pagination and Filtering logic.
+
+-----------------------------------------------------------
+
+Note: Sql Script is provided for refernce in sql_script folder in API Layer
+
+
+
+
+
+
+
+
+
+
+
+

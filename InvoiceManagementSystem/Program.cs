@@ -89,4 +89,9 @@ app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod())
 
 app.MapControllers();
 
-app.Run();
+// Run the application locally (not for Lambda)
+if (!app.Environment.IsProduction())
+{
+    app.Run();
+}
+

@@ -2,7 +2,9 @@
 using InvoiceMgmt.BAL.IService;
 using InvoiceMgmt.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace InvoiceMgmt.API.Controllers
@@ -22,12 +24,15 @@ namespace InvoiceMgmt.API.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             try
             {
+                var token = HttpContext.Request.Headers["Authorization"].ToString();
+                var tokenReplaced = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
                 var users = await _userService.GetAllUsers();
                 _logger.Information("Successfully retrieved all users.");
                 return Ok(users);
@@ -108,8 +113,9 @@ namespace InvoiceMgmt.API.Controllers
         }
 
         [AllowAnonymous]
+        [Consumes("multipart/form-data")]
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] UserCreateDTO userCreateDTO)
+        public async Task<IActionResult> AddUser([FromForm] UserCreateDTO userCreateDTO)
         {
             try
             {
@@ -119,15 +125,45 @@ namespace InvoiceMgmt.API.Controllers
                     return BadRequest(ModelState);
                 }
 
+                string profilePicPath = null;
+
+                // Check if a profile picture was uploaded
+                if (userCreateDTO.ProfilePicture != null && userCreateDTO.ProfilePicture.Length > 0)
+                {
+                    // Define the upload folder
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Files", "profile-pics");
+
+                    // Check if the directory exists; if not, create it
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Generate a unique filename for the uploaded file
+                    var fileName = $"{Guid.NewGuid()}_{userCreateDTO.ProfilePicture.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    // Save the file
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await userCreateDTO.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    profilePicPath = $"/profile-pics/{fileName}";
+                }
+
+                // Create the user object with the provided data
                 var user = new User()
                 {
                     Username = userCreateDTO.Username,
                     PasswordHash = userCreateDTO.PasswordHash,
                     Email = userCreateDTO.Email,
                     IsActive = true,
-                    RoleId = userCreateDTO.RoleId,
+                    RoleId = userCreateDTO.RoleId??1,
+                    ProfilePictureUrl = profilePicPath
                 };
 
+                // Add the user to the service
                 await _userService.AddUser(user);
                 var createdUser = await _userService.GetUserById(user.UserId);
 
@@ -146,7 +182,7 @@ namespace InvoiceMgmt.API.Controllers
                 return StatusCode(500, "Internal server error while creating user.");
             }
         }
-
+       
         [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> UpdateUser(int id, UserCreateDTO userCreateDTO)
@@ -167,7 +203,7 @@ namespace InvoiceMgmt.API.Controllers
 
                 var user = new User()
                 {
-                    UserId = userCreateDTO.UserId,
+                    UserId = (int)(userCreateDTO?.UserId),
                     Username = userCreateDTO.Username,
                     PasswordHash = userCreateDTO.PasswordHash,
                     Email = userCreateDTO.Email,

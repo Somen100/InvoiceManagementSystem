@@ -1,4 +1,6 @@
 ﻿using InvoiceMgmt.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ namespace InvoiceMgmt.DAL.IRepo
 {
     public interface IInvoiceRepo
     {
-        Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice);
+        Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice, List<IFormFile>? uploadedFiles);
         Task<Invoice> UpdateOnlyInvoiceAsync(Invoice invoice);
         Task<IEnumerable<Invoice>> GetAllInvoice(int pageNumber = 1, int pageSize = 10,
             string? invoiceNumber = null, string? status = null, int? customerId = null);
@@ -18,5 +20,6 @@ namespace InvoiceMgmt.DAL.IRepo
         Task<Invoice> UpdateInvoice(int id, Invoice invoice, List<InvoiceItem> updatedInvoiceItems);
         Task DeleteInvoice(int id);
         Task<Invoice> CreateInvoice(Invoice invoice, List<InvoiceItem> invoiceItems);
+        //Task<InvoiceFile> UploadInvoiceFiles(int invoiceId, [FromForm] ICollection<IFormFile> files);
     }
 }

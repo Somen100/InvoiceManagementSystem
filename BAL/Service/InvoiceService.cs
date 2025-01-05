@@ -2,6 +2,7 @@
 using InvoiceMgmt.DAL.IRepo;
 using InvoiceMgmt.DAL.Repo;
 using InvoiceMgmt.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace InvoiceMgmt.BAL.Service
             _invoiceRepo = invoiceRepo;
         }
 
-        public Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice)
+        public Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice, List<IFormFile>? uploadedFiles)
         {
-            return _invoiceRepo.AddOnlyInvoiceAsync(invoice);
+            return _invoiceRepo.AddOnlyInvoiceAsync(invoice, uploadedFiles);
         }
         public async Task<Invoice> UpdateOnlyInvoiceAsync(Invoice invoice)
         {

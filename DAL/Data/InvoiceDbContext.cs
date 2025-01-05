@@ -15,6 +15,8 @@ namespace InvoiceMgmt.DAL.Data
         public DbSet<AuditTrail> AuditTrails { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<RoleMaster> Roles { get; set; }
+        public DbSet<InvoiceFile> InvoiceFiles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Convert InvoiceStatus enum to string
@@ -51,6 +53,9 @@ namespace InvoiceMgmt.DAL.Data
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId);
 
+            modelBuilder.Entity<Customer>()
+             .Property(c => c.CustomerId)
+             .ValueGeneratedOnAdd();
         }
 
 
@@ -107,7 +112,15 @@ namespace InvoiceMgmt.DAL.Data
             //save
             return base.SaveChanges();
     }
+//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-} 
+//        {
+
+//            optionsBuilder.UseSqlServer("Server=sql.bsite.net\\MSSQL2016SQL; Initial Catalog=somen100_InvoiceDB; User Id=somen100_InvoiceDB; Password=sa; TrustServerCertificate=True;"
+//);
+
+//        }
+
+    }
 }
 

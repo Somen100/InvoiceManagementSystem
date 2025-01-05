@@ -9,7 +9,9 @@
 
         public bool IsActive { get; set; }
         // Foreign key for RoleMaster
-        public int RoleId { get; set; }
+        public int? RoleId { get; set; }
+
+        public string? ProfilePictureUrl { get; set; }
 
         // Navigation property
         public RoleMaster Role { get; set; }

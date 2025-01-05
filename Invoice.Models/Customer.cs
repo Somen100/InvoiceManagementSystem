@@ -16,7 +16,7 @@ namespace InvoiceMgmt.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(15)]
+        [StringLength(50)]
         public string PhoneNumber { get; set; }
 
         [StringLength(250)]

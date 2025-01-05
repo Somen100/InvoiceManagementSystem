@@ -1,0 +1,25 @@
+2024-12-24 18:44:52.646 +05:30 [ERR] Error occurred while creating user.
+System.IO.DirectoryNotFoundException: Could not find a part of the path 'D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Files\profile-pics\d9f2e41d-76a6-472a-bbb9-7ab4c225faf0_dp1.png'.
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode)
+   at InvoiceMgmt.API.Controllers.UserController.AddUser(UserCreateDTO userCreateDTO) in D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Controllers\UserController.cs:line 141
+2024-12-24 18:45:36.948 +05:30 [ERR] Error occurred while creating user.
+System.IO.DirectoryNotFoundException: Could not find a part of the path 'D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Files\profile-pics\5e0c8c8b-1fc4-4d4e-84d6-f81a1019b131_dp1.png'.
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode)
+   at InvoiceMgmt.API.Controllers.UserController.AddUser(UserCreateDTO userCreateDTO) in D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Controllers\UserController.cs:line 141
+2024-12-24 18:45:57.257 +05:30 [ERR] Error occurred while creating user.
+System.IO.DirectoryNotFoundException: Could not find a part of the path 'D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Files\profile-pics\c44c93a0-bdad-4289-b1cc-3339e759c1ad_dp1.png'.
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode)
+   at InvoiceMgmt.API.Controllers.UserController.AddUser(UserCreateDTO userCreateDTO) in D:\Project\Practice\dotnet\webapi\InvoiceMgmtSystem\InvoiceManagementSystem\InvoiceManagementSystem\Controllers\UserController.cs:line 141
+2024-12-24 18:53:22.081 +05:30 [INF] Successfully created user with ID 6.

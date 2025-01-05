@@ -3,6 +3,10 @@ using InvoiceMgmt.BAL.IService;
 using InvoiceMgmt.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Writers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace InvoiceMgmt.API.Controllers
@@ -116,12 +120,36 @@ namespace InvoiceMgmt.API.Controllers
             }
         }
 
+        //        //front-end:
+        //        let formData: FormData = new FormData();
+        //        formData.append('File', fileToUpload);
+        //formData.append('jsonString', JSON.stringify(myObject));
+
+        ////request using a var of type HttpClient
+        //http.post(url, formData);
+
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> CreateInvoiceAsync(InvoiceCreateDTO invoiceDto)
+        public async Task<IActionResult> CreateInvoiceAsync( [FromForm] List<IFormFile>? uploadedFiles,[FromForm] string? jsonString)
         {
             try
             {
+                if (string.IsNullOrEmpty(jsonString))
+                {
+                    return BadRequest("The jsonString field is required.");
+                }
+                jsonString = jsonString.Trim();
+                try
+                {
+                    JToken.Parse(jsonString); // Validates JSON format
+                }
+                catch (JsonReaderException)
+                {
+                    return BadRequest("Invalid JSON format.");
+                }
+
+                var invoiceDto = JsonConvert.DeserializeObject<InvoiceCreateDTO>(jsonString);
+
                 if (!Enum.TryParse(invoiceDto.Status, true, out InvoiceStatus parsedStatus))
                 {
                     return BadRequest($"Invalid status: {invoiceDto.Status}");
@@ -132,14 +160,14 @@ namespace InvoiceMgmt.API.Controllers
                     InvoiceNumber = invoiceDto.InvoiceNumber,
                     CustomerId = invoiceDto.CustomerId,
                     DiscountPercentage = invoiceDto.DiscountPercentage,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    CreatedAt = invoiceDto.CreatedAt,
+                    UpdatedAt = invoiceDto.UpdatedAt,
                     Status = parsedStatus,
                     IsActive = true,
                     InvoiceItems = new List<InvoiceItem>()
                 };
 
-                var createdInvoice = await _invoiceService.AddOnlyInvoiceAsync(invoice);
+                var createdInvoice = await _invoiceService.AddOnlyInvoiceAsync(invoice, uploadedFiles);
                 if (createdInvoice == null)
                 {
                     return BadRequest("Invoice Not Created");
@@ -293,5 +321,76 @@ namespace InvoiceMgmt.API.Controllers
                 return StatusCode(500, "Internal server error while updating invoice.");
             }
         }
+
+
+        //UploadInvoiceFiles
+
+        //[HttpPost("upload-files/{invoiceId}")]
+        //[Consumes("multipart/form-data")]
+        //public async Task<IActionResult> UploadInvoiceFiles(int invoiceId, [FromForm] ICollection<IFormFile> files)
+        //{
+        //    try
+        //    {
+        //        if (files == null || files.Count == 0)
+        //        {
+        //            return BadRequest("No files uploaded.");
+        //        }
+
+        //        // Ensure that the invoice exists before uploading files
+        //        var invoice = await _invoiceService.GetInvoiceById(invoiceId);
+        //        if (invoice == null)
+        //        {
+        //            return NotFound($"Invoice with ID {invoiceId} not found.");
+        //        }
+
+        //        var uploadedFiles = new List<InvoiceFile>();
+
+        //        foreach (var file in files)
+        //        {
+        //            // Define the upload folder
+        //            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Files", "receipt-images");
+
+        //            // Check if the directory exists; if not, create it
+        //            if (!Directory.Exists(uploadsFolder))
+        //            {
+        //                Directory.CreateDirectory(uploadsFolder);
+        //            }
+
+        //            // Generate a unique filename for the uploaded file
+        //            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+        //            var filePath = Path.Combine(uploadsFolder, fileName);
+
+        //            // Save the file
+        //            using (var stream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                await file.CopyToAsync(stream);
+        //            }
+
+        //            // Create InvoiceFile object to store file data in DB
+        //            var invoiceFile = new InvoiceFile
+        //            {
+        //                InvoiceId = invoiceId,
+        //                FileName = fileName,
+        //                FilePath = filePath,
+        //                UploadDate = DateTime.Now  // Set current date and time
+        //            };
+
+        //            uploadedFiles.Add(invoiceFile);
+        //        }
+
+        //        // Save all uploaded files to the database
+        //        await _context.InvoiceFiles.AddRangeAsync(uploadedFiles);
+        //        await _context.SaveChangesAsync();
+
+        //        return Ok(new { Message = "Files uploaded successfully.", Files = uploadedFiles });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log and return an error response
+        //        _logger.Error(ex, "Error occurred while uploading invoice files.");
+        //        return StatusCode(500, "Internal server error while uploading files.");
+        //    }
+        //}
+
     }
 }

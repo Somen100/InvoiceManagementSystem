@@ -1,6 +1,7 @@
 ﻿using InvoiceMgmt.DAL.Data;
 using InvoiceMgmt.DAL.IRepo;
 using InvoiceMgmt.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceMgmt.DAL.Repo
@@ -14,10 +15,52 @@ namespace InvoiceMgmt.DAL.Repo
         }
 
 
-        public async Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice)
+        public async Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice, List<IFormFile>? uploadedFiles)
         {
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
+
+            // Process the uploaded files and associate them with the invoice
+            if (uploadedFiles != null && uploadedFiles.Count > 0)
+            {
+                var uploadedInvoiceFiles = new List<InvoiceFile>();
+
+                foreach (var file in uploadedFiles)
+                {
+                    // Define the file path where files will be stored
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Files", "invoice-files");
+
+                    // Check if the folder exists, create it if not
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Generate a unique file name for each uploaded file
+                    var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    // Save the file to the file system
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+
+                    // Create InvoiceFile objects for each uploaded file
+                    var invoiceFile = new InvoiceFile
+                    {
+                        InvoiceId = invoice.InvoiceId,
+                        FileName = fileName,  
+                        FilePath = filePath,  
+                        UploadDate = DateTime.Now 
+                    };
+                    uploadedInvoiceFiles.Add(invoiceFile);
+                    await _context.SaveChangesAsync();
+                }
+                // Add the invoice files to the database in bulk
+                await _context.InvoiceFiles.AddRangeAsync(uploadedInvoiceFiles);
+                await _context.SaveChangesAsync(); // Save changes
+            }
             return invoice;
         }
         public async Task<Invoice> UpdateOnlyInvoiceAsync(Invoice invoice)
@@ -39,8 +82,9 @@ namespace InvoiceMgmt.DAL.Repo
         }
 
         public async Task<IEnumerable<Invoice>> GetAllInvoice(int pageNumber = 1, int pageSize = 10,
-             string? invoiceNumber = null, string? status = "draft", int? customerId = null)
+             string? invoiceNumber = null, string? status="", int? customerId = null)
         {
+            status = status ?? "draft";
             // Start with the base query
             IQueryable<Invoice> query = _context.Invoices
                 .Include(i => i.InvoiceItems)
@@ -91,16 +135,7 @@ namespace InvoiceMgmt.DAL.Repo
         {
             // Add Invoice to the Invoice table
             _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync(); // Save to get the Invoice ID
-
-            // Add InvoiceItems to the InvoiceItem table
-            foreach (var item in invoiceItems)
-            {
-                item.InvoiceId = invoice.InvoiceId;  // Set the foreign key relationship
-                _context.InvoiceItems.Add(item);
-            }
             await _context.SaveChangesAsync();
-
             return invoice;
         }
 

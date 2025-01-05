@@ -1,8 +1,13 @@
 ﻿using InvoiceMgmt.BAL.IService;
+using InvoiceMgmt.BAL.IService.BulkUploads;
 using InvoiceMgmt.BAL.Service;
+using InvoiceMgmt.BAL.Service.BulkUploads;
 using InvoiceMgmt.DAL.GenericRepository;
 using InvoiceMgmt.DAL.IRepo;
+using InvoiceMgmt.DAL.IRepo.BulkUploads;
 using InvoiceMgmt.DAL.Repo;
+using InvoiceMgmt.DAL.Repo.BulkUploads;
+using Microsoft.OpenApi.Models;
 
 namespace InvoiceMgmt.API
 {
@@ -38,6 +43,10 @@ namespace InvoiceMgmt.API
             collection.AddScoped<IRoleMasterService, RoleMasterService>();
             collection.AddScoped<IRoleMasterRepo, RoleMasterRepo>();
 
+            collection.AddScoped<IBulkUploadsCustomersService, BulkUploadsCustomersService>();
+            collection.AddScoped<IUploadBulkCustomersRepo, UploadBulkCustomersRepo>();
+
+
             collection.AddScoped<JwtTokenService>();
         }
 
@@ -50,6 +59,14 @@ namespace InvoiceMgmt.API
                     builder => builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader());
+            });
+        }
+        public static void ConfigureServices(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Invoice API", Version = "v1" });
+                c.OperationFilter<SwaggerFileUploadOperationFilter>(); // Add the custom filter here
             });
         }
 

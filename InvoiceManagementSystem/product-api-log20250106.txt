@@ -1,0 +1,4 @@
+2025-01-06 04:16:03.442 +05:30 [INF] Successfully added product with ID 1.
+2025-01-06 04:16:19.806 +05:30 [INF] Successfully added product with ID 2.
+2025-01-06 04:16:44.753 +05:30 [INF] Successfully added product with ID 3.
+2025-01-06 04:16:53.771 +05:30 [INF] Successfully retrieved all products.

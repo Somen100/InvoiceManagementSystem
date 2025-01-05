@@ -7,6 +7,7 @@ using Serilog;
 using System.Text;
 using Microsoft.Extensions.Hosting;
 using InvoiceMgmt.API.Middleware;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,9 @@ builder.Host.UseSerilog();
 var _configuration = builder.Configuration;
 builder.Services.RegisterRepos(_configuration);
 // Add services to the container.
+// Add Stripe configuration
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

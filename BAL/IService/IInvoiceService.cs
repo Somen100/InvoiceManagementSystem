@@ -1,4 +1,5 @@
 ﻿using InvoiceMgmt.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace InvoiceMgmt.BAL.IService
     public interface IInvoiceService
     {
         Task<Invoice> UpdateOnlyInvoiceAsync(Invoice invoice);
-        Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice);
+        Task<Invoice> AddOnlyInvoiceAsync(Invoice invoice, List<IFormFile>? uploadedFiles);
         Task<IEnumerable<Invoice>> GetAllInvoice(int pageNumber = 1, int pageSize = 10,
             string? invoiceNumber = null, string? status = null, int? customerId = null);
         Task<Invoice> GetInvoiceById(int id);

@@ -49,3 +49,26 @@
 
       ------------------------------------------
       ALTER TABLE [InvoiceItems] DROP COLUMN [UnitPrice];
+
+      ----------------------------------------------
+
+      ALTER TABLE [Users] ADD [ProfilePictureUrl] nvarchar(max) NOT NULL DEFAULT N'';
+
+      =======================================================
+
+
+      CREATE TABLE [InvoiceFiles] (
+    [InvoiceFileId] int NOT NULL IDENTITY,
+    [InvoiceId] int NOT NULL,
+    [FileName] nvarchar(max) NOT NULL,
+    [FilePath] nvarchar(max) NOT NULL,
+    [UploadDate] datetime2 NOT NULL,
+    CONSTRAINT [PK_InvoiceFiles] PRIMARY KEY ([InvoiceFileId]),
+    CONSTRAINT [FK_InvoiceFiles_Invoices_InvoiceId] FOREIGN KEY ([InvoiceId]) REFERENCES [Invoices] ([InvoiceId]) ON DELETE CASCADE
+);
+[21:29:29 INF] Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE INDEX [IX_InvoiceFiles_InvoiceId] ON [InvoiceFiles] ([InvoiceId]);
+
+  ----------------------------------------------
+
+ALTER TABLE [Customers] ALTER COLUMN [PhoneNumber] nvarchar(50) NOT NULL;

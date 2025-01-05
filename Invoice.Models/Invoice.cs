@@ -32,6 +32,7 @@ namespace InvoiceMgmt.Models
 
        // [JsonIgnore] // Prevent serialization of navigation property
         public ICollection<InvoiceItem> InvoiceItems { get; set; } 
+        public ICollection<InvoiceFile>? invoiceFiles { get; set; }
         public Customer Customer { get; set; }
 
     }

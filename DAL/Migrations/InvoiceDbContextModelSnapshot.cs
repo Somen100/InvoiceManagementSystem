@@ -81,8 +81,8 @@ namespace InvoiceMgmt.DAL.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("CustomerId");
 
@@ -133,6 +133,35 @@ namespace InvoiceMgmt.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("InvoiceMgmt.Models.InvoiceFile", b =>
+                {
+                    b.Property<int>("InvoiceFileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceFileId"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("InvoiceFileId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("InvoiceFiles");
                 });
 
             modelBuilder.Entity("InvoiceMgmt.Models.InvoiceItem", b =>
@@ -211,7 +240,6 @@ namespace InvoiceMgmt.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RoleName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoleId");
@@ -238,7 +266,10 @@ namespace InvoiceMgmt.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
@@ -261,6 +292,17 @@ namespace InvoiceMgmt.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("InvoiceMgmt.Models.InvoiceFile", b =>
+                {
+                    b.HasOne("InvoiceMgmt.Models.Invoice", "Invoice")
+                        .WithMany("invoiceFiles")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("InvoiceMgmt.Models.InvoiceItem", b =>
@@ -286,9 +328,7 @@ namespace InvoiceMgmt.DAL.Migrations
                 {
                     b.HasOne("InvoiceMgmt.Models.RoleMaster", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });
@@ -301,6 +341,8 @@ namespace InvoiceMgmt.DAL.Migrations
             modelBuilder.Entity("InvoiceMgmt.Models.Invoice", b =>
                 {
                     b.Navigation("InvoiceItems");
+
+                    b.Navigation("invoiceFiles");
                 });
 
             modelBuilder.Entity("InvoiceMgmt.Models.RoleMaster", b =>
